@@ -1,0 +1,15 @@
+package kpfu.itis.kasimov.repositories;
+
+import kpfu.itis.kasimov.models.UserCourse;
+import kpfu.itis.kasimov.models.UserCourseKey;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface UserCourseRepository extends JpaRepository<UserCourse, UserCourseKey> {
+    List<UserCourse> findByUser_Id(Integer userId);
+    List<UserCourse> findByCourse_Id(Integer courseId);
+}
+
