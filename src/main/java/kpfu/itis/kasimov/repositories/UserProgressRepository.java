@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface UserProgressRepository extends JpaRepository<UserProgress, Long> {
+public interface UserProgressRepository extends JpaRepository<UserProgress, Integer> {
     Optional<UserProgress> findByUser_IdAndCourse_Id(Integer userId, Integer courseId);
     List<UserProgress> findByUser_Id(Integer userId);
 }

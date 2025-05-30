@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chill Study</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="/css/home.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+  <div class="container">
+    <a class="navbar-brand" href="#">
+      <i class="fas fa-graduation-cap me-2"></i>
+      Chill Study
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-center">
+        <li class="nav-item">
+          <a class="nav-link active" th:href="@{/home}">
+            <i class="fas fa-home me-1"></i> Главная
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" th:href="@{/courses}">
+            <i class="fas fa-book me-1"></i> Мои курсы
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" th:href="@{/profile}">
+            <i class="fas fa-user me-1"></i> Профиль
+          </a>
+        </li>
+
+        <!-- если user пустой -->
+        <li class="nav-item" th:if="${user == null}">
+          <a class="nav-link" th:href="@{/login}">
+            <i class="fas fa-sign-in-alt me-1"></i> Войти
+          </a>
+        </li>
+        <li class="nav-item" th:if="${user == null}">
+          <a class="nav-link" th:href="@{/registration}">
+            <i class="fas fa-user-plus me-1"></i> Регистрация
+          </a>
+        </li>
+
+        <!-- если user не пустой -->
+        <li class="nav-item dropdown" th:if="${user != null}">
+          <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown"
+             role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <img th:src="${user.avatarUrl != null} ? ${user.avatarUrl} : '/images/default-avatar.png'"
+                 alt="Аватар" class="user-avatar me-2" />
+            <span th:text="${user.name}">User Name</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+            <li>
+              <a class="dropdown-item" th:href="@{/profile}">
+                <i class="fas fa-user-circle me-2"></i>Мой профиль
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"/></li>
+            <li>
+              <a class="dropdown-item" th:href="@{/logout}">
+                <i class="fas fa-sign-out-alt me-2"></i>Выйти
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main class="main-content">
+  <div class="container py-4">
+    <h2 class="text-center mb-4">Исследуйте курсы</h2>
+    <p class="text-center subtitle mb-5">Найдите курс, который поможет вам достичь ваших целей</p>
+
+    <div class="search-bar mb-4">
+      <form action="#" th:action="@{/searchCourses}" method="get" class="d-flex">
+        <div class="input-group">
+                    <span class="input-group-text bg-transparent border-0">
+                        <i class="fas fa-search"></i>
+                    </span>
+          <input type="text" name="query" class="form-control" placeholder="Поиск курсов..." required />
+          <button type="submit" class="btn btn-primary">Найти</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- кнопка "Добавить курс" для преподавателя -->
+    <div class="text-end mb-4" th:if="${user != null and user.role == 'teacher'}">
+      <a th:href="@{/addCourse}" class="btn btn-add-course">
+        <i class="fas fa-plus me-2"></i>Добавить курс
+      </a>
+    </div>
+
+    <div class="row justify-content-center g-4">
+      <div class="col-12 col-md-6 col-lg-4" th:each="course : ${courses}">
+        <div class="course-card-container">
+          <a th:href="@{/courses/{id}(id=${course.id})}" class="text-decoration-none">
+          <div class="course-card">
+              <div class="card-body">
+                <h5 class="card-title">
+                  <i class="fas fa-book-open me-2"></i><span th:text="${course.name}">Course Name</span>
+                </h5>
+                <p class="card-text" th:text="${course.description}">Course Description</p>
+
+                <div class="rating mb-3">
+                  <i class="fas fa-star" th:each="i : ${#numbers.sequence(1,5)}"
+                     th:classappend="${i <= course.averageRating} ? ' active' : ''"></i>
+                  <span class="rating-text" th:text="${#numbers.formatDecimal(course.averageRating, 1, 1)}">4.5</span>
+                </div>
+
+                <div class="course-action" th:if="${user != null and user.role != 'teacher'}">
+                  <div th:switch="${enrolledCourseIds.contains(course.id)}">
+                    <button type="button" class="btn btn-enrolled" th:case="true" disabled>
+                      <i class="fas fa-check me-2"></i>Вы записаны
+                    </button>
+                    <form th:case="false" action="#" th:action="@{/enroll}" method="post" class="d-inline">
+                      <input type="hidden" name="userId" th:value="${user.id}" />
+                      <input type="hidden" name="courseId" th:value="${course.id}" />
+                      <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-graduation-cap me-2"></i>Записаться
+                      </button>
+                    </form>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const cards = document.querySelectorAll('.course-card-container');
+    cards.forEach((card, index) => {
+      card.style.animation = `fadeInUp 0.5s ease forwards ${index * 0.1}s`;
+    });
+  });
+</script>
+</body>
+</html>

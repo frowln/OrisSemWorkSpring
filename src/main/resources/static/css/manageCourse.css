@@ -1,0 +1,453 @@
+:root {
+    --primary-color: #0ea5e9;
+    --primary-dark: #0369a1;
+    --primary-light: #38bdf8;
+    --secondary-color: #f1f5f9;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --background-light: #f8fafc;
+    --shadow-color: rgba(14, 165, 233, 0.1);
+    --primary-gradient: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
+    --success-color: #16a34a;
+    --danger-color: #dc2626;
+}
+
+.manage-course-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+    min-height: calc(100vh - 64px - 250px);
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 2rem 0;
+}
+
+.header-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.page-title {
+    color: var(--primary-color) !important;
+    font-weight: 800;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem !important;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.page-subtitle {
+    color: var(--text-secondary);
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.course-content {
+    display: grid;
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.course-info-card,
+.lessons-card,
+.students-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px var(--shadow-color);
+    overflow: hidden;
+}
+
+.card-header {
+    background: var(--primary-gradient);
+    color: white;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.card-header i {
+    font-size: 1.5rem;
+}
+
+.card-header h3 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.3rem;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+.info-group {
+    margin-bottom: 1.5rem;
+}
+
+.info-group:last-child {
+    margin-bottom: 0;
+}
+
+.info-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.info-group label i {
+    color: var(--primary-color);
+}
+
+.info-group p {
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn i {
+    font-size: 1.1rem;
+}
+
+.btn-edit {
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+}
+
+.btn-edit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px var(--shadow-color);
+    color: white;
+}
+
+.btn-delete {
+    background: #FEE2E2;
+    color: #DC2626;
+    border: none;
+}
+
+.btn-delete:hover {
+    background: #FEE2E2;
+    color: #DC2626;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(220, 38, 38, 0.1);
+}
+
+.lessons-card .card-header {
+    justify-content: space-between;
+    padding-right: 1rem;
+}
+
+.btn-add-lesson {
+    background: white;
+    color: var(--primary-color);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-add-lesson:hover {
+    background: rgba(255, 255, 255, 0.9);
+    transform: translateY(-2px);
+}
+
+.lessons-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.lesson-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--background-light);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.lesson-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 15px var(--shadow-color);
+}
+
+.lesson-info {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex: 1;
+}
+
+.lesson-number {
+    width: 40px;
+    height: 40px;
+    background: var(--primary-gradient);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.lesson-details {
+    flex: 1;
+}
+
+.lesson-title {
+    color: var(--text-primary);
+    font-weight: 600;
+    margin: 0 0 0.3rem 0;
+}
+
+.lesson-description {
+    color: var(--text-secondary);
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.lesson-actions {
+    display: flex;
+    gap: 0.8rem;
+}
+
+.btn-edit-lesson {
+    background: var(--secondary-color);
+    color: var(--primary-color);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.btn-edit-lesson:hover {
+    background: var(--primary-light);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-delete-lesson {
+    background: #FEE2E2;
+    color: #DC2626;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.btn-delete-lesson:hover {
+    background: #FEE2E2;
+    color: #DC2626;
+    transform: translateY(-2px);
+}
+
+.empty-lessons {
+    text-align: center;
+    padding: 3rem 2rem;
+}
+
+.empty-lessons i {
+    font-size: 3rem;
+    color: var(--primary-light);
+    margin-bottom: 1rem;
+}
+
+.empty-lessons p {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+}
+
+.btn-add-first-lesson {
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    padding: 0.8rem 2rem;
+    border-radius: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-add-first-lesson:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px var(--shadow-color);
+}
+
+.table-responsive {
+    overflow-x: auto;
+    margin: 0 -1rem;
+    padding: 0 1rem;
+}
+
+.students-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.students-table th {
+    background: var(--secondary-color);
+    color: var(--text-primary);
+    font-weight: 600;
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 2px solid var(--primary-light);
+}
+
+.students-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--secondary-color);
+    color: var(--text-secondary);
+}
+
+.student-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.student-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.btn-remove {
+    background: #FEE2E2;
+    color: #DC2626;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.btn-remove:hover {
+    background: #FEE2E2;
+    color: #DC2626;
+    transform: translateY(-2px);
+}
+
+.modal-content {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    background: var(--primary-gradient);
+    color: white;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    padding: 1.5rem;
+}
+
+.modal-title {
+    font-weight: 600;
+}
+
+.btn-close {
+    filter: brightness(0) invert(1);
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.form-label i {
+    color: var(--primary-color);
+}
+
+.form-control {
+    border: 2px solid var(--secondary-color);
+    border-radius: 12px;
+    padding: 0.8rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px var(--shadow-color);
+}
+
+.modal-footer {
+    padding: 1.5rem;
+    border-top: 1px solid var(--secondary-color);
+}
+
+.modal-footer .btn {
+    padding: 0.8rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+.modal-footer .btn-secondary {
+    background: var(--secondary-color);
+    color: var(--text-secondary);
+    border: none;
+}
+
+.modal-footer .btn-primary {
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.course-info-card,
+.lessons-card,
+.students-card {
+    animation: fadeIn 0.6s ease-out;
+}

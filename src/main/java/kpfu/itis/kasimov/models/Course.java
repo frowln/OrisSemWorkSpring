@@ -1,6 +1,7 @@
 package kpfu.itis.kasimov.models;
 
 import jakarta.persistence.*;
+import kpfu.itis.kasimov.dto.CourseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,5 +30,13 @@ public class Course {
 
     @Column(name = "average_rating")
     private Double averageRating;
+
+    @ManyToMany
+    @JoinTable(
+            name = "enrollments",
+            joinColumns = @JoinColumn(name = "course_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<User> students;
 }
 

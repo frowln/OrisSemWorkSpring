@@ -1,0 +1,73 @@
+<!-- fragments/header.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head></head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+  <div class="container">
+    <a class="navbar-brand" th:href="@{/home}">
+      <i class="fas fa-graduation-cap me-2"></i> Chill Study
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-center">
+
+        <li class="nav-item">
+          <a class="nav-link" th:classappend="${#request.requestURI == '/home'} ? 'active'" th:href="@{/home}">
+            <i class="fas fa-home me-1"></i> Главная
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" th:href="@{/courses}">
+            <i class="fas fa-book me-1"></i> Мои курсы
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" th:href="@{/profile}">
+            <i class="fas fa-user me-1"></i> Профиль
+          </a>
+        </li>
+
+        <!-- Если пользователь не аутентифицирован -->
+        <li sec:authorize="!isAuthenticated()">
+          <a class="nav-link" th:href="@{/login}">
+            <i class="fas fa-sign-in-alt me-1"></i> Войти
+          </a>
+        </li>
+        <li sec:authorize="!isAuthenticated()">
+          <a class="nav-link" th:href="@{/registration}">
+            <i class="fas fa-user-plus me-1"></i> Регистрация
+          </a>
+        </li>
+
+        <!-- Если пользователь аутентифицирован -->
+        <li sec:authorize="isAuthenticated()" class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown"
+             role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <img th:src="${#authentication.principal.avatarUrl != null} ? ${#authentication.principal.avatarUrl} : '@{/images/default-avatar.png'}"
+                 alt="Аватар" class="user-avatar me-2" style="width: 32px; height: 32px; border-radius: 50%;">
+            <span th:text="${#authentication.principal.name}">Имя</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+            <li>
+              <a class="dropdown-item" th:href="@{/profile}">
+                <i class="fas fa-user-circle me-2"></i>Мой профиль
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item" th:href="@{/logout}">
+                <i class="fas fa-sign-out-alt me-2"></i>Выйти
+              </a>
+            </li>
+          </ul>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+</nav>
+</body>
+</html>

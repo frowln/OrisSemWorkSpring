@@ -1,0 +1,214 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary-color: #0ea5e9;
+    --primary-dark: #0369a1;
+    --primary-light: #38bdf8;
+    --secondary-color: #f1f5f9;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --background-light: #f8fafc;
+    --shadow-color: rgba(14, 165, 233, 0.1);
+    --primary-gradient: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
+    --success-color: #16a34a;
+    --danger-color: #dc2626;
+}
+
+.add-lesson-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+}
+
+.form-card {
+    background: white;
+    border-radius: 24px;
+    padding: 2.5rem;
+    box-shadow: 0 4px 20px var(--shadow-color);
+    animation: fadeIn 0.6s ease-out;
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.form-title {
+    color: var(--text-primary);
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.form-subtitle {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.lesson-form {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    color: var(--text-primary);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 2px solid var(--input-border);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+}
+
+.tox-tinymce {
+    border-radius: 12px !important;
+    border: 2px solid var(--input-border) !important;
+    overflow: hidden;
+}
+
+.tox .tox-toolbar__primary {
+    background: var(--background-light) !important;
+    border-bottom: 1px solid var(--input-border) !important;
+}
+
+.tox .tox-edit-area__iframe {
+    background: white !important;
+}
+
+.btn-container {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2.5rem;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-primary {
+    background: var(--primary-gradient);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
+}
+
+.btn-secondary {
+    background: var(--secondary-color);
+    color: var(--primary-color);
+}
+
+.btn-secondary:hover {
+    background: var(--primary-light);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn i {
+    margin-right: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.form-text {
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    color: var(--text-secondary);
+}
+
+.alert {
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.alert-success {
+    background: rgba(22, 163, 74, 0.1);
+    color: var(--success-color);
+    border: 1px solid rgba(22, 163, 74, 0.2);
+}
+
+.alert-error {
+    background: rgba(220, 38, 38, 0.1);
+    color: var(--danger-color);
+    border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+.file-input-wrapper {
+    position: relative;
+    margin-top: 1rem;
+}
+
+.file-input-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: var(--secondary-color);
+    border: 2px dashed var(--primary-light);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.file-input-label:hover {
+    background: var(--primary-light);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.file-input-label i {
+    margin-right: 0.5rem;
+    font-size: 1.2rem;
+}
+
+input[type="file"] {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

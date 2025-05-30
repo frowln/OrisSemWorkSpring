@@ -1,6 +1,7 @@
 package kpfu.itis.kasimov.models;
 
 import jakarta.persistence.*;
+import kpfu.itis.kasimov.dto.UserDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,4 +28,8 @@ public class User {
 
     @Column(name = "avatar_url")
     private String avatarUrl;
+    @ManyToMany(mappedBy = "students") // students — это имя поля в Course
+    private List<Course> enrolledCourses;
+
+
 }

@@ -1,6 +1,7 @@
 package kpfu.itis.kasimov.models;
 
 import jakarta.persistence.*;
+import kpfu.itis.kasimov.dto.UserProgressDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
