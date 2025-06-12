@@ -2,6 +2,7 @@ package kpfu.itis.kasimov.services;
 
 import kpfu.itis.kasimov.models.User;
 import kpfu.itis.kasimov.repositories.UserRepository;
+import kpfu.itis.kasimov.util.GenerateDefaultIcon;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,11 @@ public class RegistrationService {
         } else {
             // Если что-то пошло не так, можно задать роль по умолчанию
             user.setRole("ROLE_USER");
+        }
+
+        // Генерация дефолтного аватара, если пусто
+        if (user.getAvatarUrl() == null || user.getAvatarUrl().isEmpty()) {
+            user.setAvatarUrl(GenerateDefaultIcon.generateDefaultIcon(user.getName()));
         }
 
         userRepository.save(user);

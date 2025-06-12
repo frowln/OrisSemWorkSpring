@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${lesson.name}">Урок</title>
+    <link href="/css/home.css" rel="stylesheet" type="text/css">
+    <link href="/css/lesson.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+<th:block th:replace="fragments/navbar :: navbar (activePage='courses')"></th:block>
+
+
+<div class="container mt-5">
+    <h1 th:text="${lesson.name}">Название урока</h1>
+    <hr>
+    <div class="lesson-content">
+        <p th:utext="${lesson.body}">Содержимое урока</p>
+    </div>
+    <a th:href="@{/courses/{id}(id=${lesson.course.id})}" class="btn btn-secondary mt-3">Назад к курсу</a>
+
+    <div th:if="${enrolled}" class="d-flex justify-content-center mt-4">
+        <form th:action="@{/lessons/{id}/complete(id=${lesson.id})}" method="post">
+            <button type="submit"
+                    class="btn"
+                    th:classappend="${completed} ? 'btn-secondary' : 'btn-success'"
+                    th:disabled="${completed}">
+                <span th:text="${completed} ? 'Пройдено' : 'Завершить'"></span>
+            </button>
+        </form>
+    </div>
+
+    <div th:if="${!enrolled}">
+        <button class="btn btn-secondary" disabled style="opacity: 0.6; cursor: not-allowed;">
+            <i class="fas fa-lock me-2"></i>Урок недоступен. Запишитесь на курс.
+        </button>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

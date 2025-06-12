@@ -29,16 +29,33 @@ public class UserProgressService {
     }
 
     public void updateProgress(Integer userId, Integer courseId, int completedLessons, int totalLessons) {
-        User user = userRepository.findById(userId).orElseThrow();
-        Course course = courseRepository.findById(courseId).orElseThrow();
-        UserProgress progress = new UserProgress();
-        progress.setUser(user);
-        progress.setCourse(course);
-        progress.setCompletedLessons(completedLessons);
-        progress.setTotalLessons(totalLessons);
-        progress.setLastUpdated(new Timestamp(System.currentTimeMillis()));
+
+        Optional<UserProgress> optionalProgress = userProgressRepository.findByUser_IdAndCourse_Id(userId, courseId);
+
+        UserProgress progress;
+
+        if (optionalProgress.isPresent()) {
+            // Update existing progress
+            progress = optionalProgress.get();
+            progress.setCompletedLessons(completedLessons);
+            progress.setTotalLessons(totalLessons);
+            progress.setLastUpdated(new Timestamp(System.currentTimeMillis()));
+        } else {
+            // Insert new progress
+            User user = userRepository.findById(userId).orElseThrow();
+            Course course = courseRepository.findById(courseId).orElseThrow();
+
+            progress = new UserProgress();
+            progress.setUser(user);
+            progress.setCourse(course);
+            progress.setCompletedLessons(completedLessons);
+            progress.setTotalLessons(totalLessons);
+            progress.setLastUpdated(new Timestamp(System.currentTimeMillis()));
+        }
+
         userProgressRepository.save(progress);
     }
+
 
     public Optional<UserProgress> getEntityByUserAndCourse(Integer userId, Integer courseId) {
         return findByUserIdAndCourseId(userId, courseId)

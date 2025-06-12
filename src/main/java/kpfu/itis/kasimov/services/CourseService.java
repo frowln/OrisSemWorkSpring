@@ -43,5 +43,19 @@ public class CourseService {
         return courseRepository.findAll();
     }
 
+    public List<CourseDTO> findCoursesByStudentId(Integer studentId) {
+        return courseRepository.findCoursesByStudentId(studentId)
+                .stream()
+                .map(CourseDTO::valueOf)
+                .toList();
+    }
+
+    public List<Course> searchCourses(String query) {
+        if (query == null || query.isBlank()) {
+            return courseRepository.findAll();
+        }
+        return courseRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(query, query);
+    }
+
 
 }

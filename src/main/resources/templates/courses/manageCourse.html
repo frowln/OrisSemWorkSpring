@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Управление курсом</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/css/home.css" rel="stylesheet" type="text/css">
+  <link href="/css/manageCourse.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<th:block th:replace="fragments/navbar :: navbar (activePage='courses')"></th:block>
+
+<div class="manage-course-container">
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Управление курсом</h1>
+      <p class="page-subtitle" th:text="${course.name}"></p>
+    </div>
+  </div>
+
+  <div class="course-content">
+    <div class="course-info-card">
+      <div class="card-header">
+        <i class="fas fa-info-circle"></i>
+        <h3>Информация о курсе</h3>
+      </div>
+      <div class="card-body">
+        <div class="info-group">
+          <label><i class="fas fa-align-left"></i> Описание</label>
+          <p th:text="${course.description}"></p>
+        </div>
+        <div class="info-group">
+          <label><i class="fas fa-chalkboard-teacher"></i> Преподаватель</label>
+          <p th:text="${teacherName}"></p>
+        </div>
+        <div class="action-buttons">
+          <a th:href="@{/courses/{id}/edit(id=${course.id})}" class="btn btn-edit">
+            <i class="fas fa-edit"></i>
+            Редактировать
+          </a>
+          <form th:action="@{/courses/{id}/delete(id=${course.id})}" method="post" class="delete-form">
+            <input type="hidden" name="id" th:value="${course.id}">
+            <button type="submit" class="btn btn-delete"
+                    onclick="return confirm('Вы уверены, что хотите удалить этот курс?');">
+              <i class="fas fa-trash-alt"></i>
+              Удалить курс
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="lessons-card">
+      <div class="card-header">
+        <i class="fas fa-book-reader"></i>
+        <h3>Уроки курса</h3>
+        <a th:href="@{/lessons/new(courseId=${course.id})}" class="btn btn-add-lesson">
+          <i class="fas fa-plus"></i>
+          Добавить урок
+        </a>
+      </div>
+
+      <div class="card-body">
+        <div class="lessons-list">
+          <th:block th:each="lesson, status : ${lessons}">
+            <div class="lesson-item">
+              <div class="lesson-info">
+                <div class="lesson-number" th:text="${status.index + 1}"></div>
+                <div class="lesson-details">
+                  <h4 class="lesson-title" th:text="${lesson.name}"></h4>
+                </div>
+              </div>
+              <div class="lesson-actions">
+                <a th:href="@{/lessons/{id}/edit(id=${lesson.id}, courseId=${course.id})}" class="btn btn-edit-lesson">
+                  <i class="fas fa-edit"></i>
+                  Редактировать
+                </a>
+                <form th:action="@{/lessons/{id}/delete(id=${lesson.id})}" method="post" class="delete-lesson-form">
+                  <input type="hidden" name="courseId" th:value="${course.id}">
+                  <input type="hidden" name="id" th:value="${lesson.id}">
+                  <button type="submit" class="btn btn-delete-lesson"
+                          onclick="return confirm('Вы уверены, что хотите удалить этот урок?');">
+                    <i class="fas fa-trash-alt"></i>
+                    Удалить
+                  </button>
+                </form>
+              </div>
+            </div>
+          </th:block>
+
+          <th:block th:if="${#lists.isEmpty(lessons)}">
+            <div class="empty-lessons">
+              <i class="fas fa-book"></i>
+              <p>В этом курсе пока нет уроков</p>
+            </div>
+          </th:block>
+        </div>
+      </div>
+    </div>
+
+    <div class="students-card">
+      <div class="card-header">
+        <i class="fas fa-users"></i>
+        <h3>Записанные студенты</h3>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="students-table">
+            <thead>
+            <tr>
+              <th>ID</th>
+              <th>Имя</th>
+              <th>Email</th>
+              <th>Действия</th>
+            </tr>
+            </thead>
+            <tbody>
+            <th:block th:each="student : ${students}">
+              <tr>
+                <td th:text="${student.id}"></td>
+                <td>
+                  <div class="student-info">
+                    <img th:src="${student.avatarUrl != null} ? ${student.avatarUrl} : '/images/default-avatar.png'"
+                         alt="Аватар" class="student-avatar">
+                    <span th:text="${student.name}"></span>
+                  </div>
+                </td>
+                <td th:text="${student.email}"></td>
+                <td>
+                  <form th:action="@{/courses/{courseId}/remove-student(courseId=${course.id})}" method="post" class="remove-student-form">
+                    <input type="hidden" name="studentId" th:value="${student.id}">
+                    <input type="hidden" name="courseId" th:value="${course.id}">
+                    <button type="submit" class="btn btn-remove">
+                      <i class="fas fa-user-minus"></i>
+                      Отчислить
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            </th:block>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Модальное окно добавления урока -->
+<div class="modal fade" id="addLessonModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Добавить новый урок</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <form th:action="@{/lessons/new}" method="post">
+        <div class="modal-body">
+          <!-- ID курса (скрытое поле) -->
+          <input type="hidden" name="courseId" th:value="${course.id}">
+
+          <!-- Название урока -->
+          <div class="mb-3">
+            <label for="lessonName" class="form-label">
+              <i class="fas fa-heading"></i> Название урока
+            </label>
+            <input type="text" class="form-control" id="lessonName" name="name" required>
+          </div>
+
+          <!-- Содержание урока -->
+          <div class="mb-3">
+            <label for="lessonBody" class="form-label">
+              <i class="fas fa-align-left"></i> Содержание урока
+            </label>
+            <textarea class="form-control" id="lessonBody" name="body" rows="4" required></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+          <button type="submit" class="btn btn-primary">Добавить урок</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

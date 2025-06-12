@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${course.name} + ' | Образовательная Платформа'">Название курса</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/css/course.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<th:block th:replace="fragments/navbar :: navbar (activePage='courses')"></th:block>
+
+<div class="container py-5">
+  <div class="course-header animate-fade-in">
+    <h1 class="course-title" th:text="${course.name}">Название курса</h1>
+    <p class="course-description" th:text="${course.description}">Описание курса</p>
+
+    <div class="d-flex align-items-center gap-4 mb-4">
+      <div class="rating">
+        <th:block th:each="i : ${#numbers.sequence(1,5)}">
+          <i class="fas fa-star" th:classappend="${i <= course.averageRating} ? 'active' : ''"></i>
+        </th:block>
+        <span class="ms-2 text-white" th:text="${course.averageRating + '/5'}">5/5</span>
+      </div>
+      <div class="course-stats">
+        <i class="fas fa-users me-2"></i>
+        <span th:text="${enrolledStudents + ' студентов'}">0 студентов</span>
+      </div>
+      <div class="course-stats">
+        <i class="fas fa-book me-2"></i>
+        <span th:text="${lessons.size()} + ' уроков'">0 уроков</span>
+      </div>
+    </div>
+
+    <div class="course-actions">
+      <th:block th:if="${user != null and user.role != 'ROLE_TEACHER'}">
+        <th:block th:if="${enrolled}">
+          <form th:action="@{/enroll/leave}" method="post" class="d-inline">
+            <input type="hidden" name="courseId" th:value="${course.id}">
+            <button type="submit" class="btn btn-danger btn-lg">
+              <i class="fas fa-times me-2"></i>Покинуть курс
+            </button>
+          </form>
+        </th:block>
+        <th:block th:if="${!enrolled}">
+          <form th:action="@{/enroll}" method="post" class="d-inline">
+            <input type="hidden" name="courseId" th:value="${course.id}">
+            <button type="submit" class="btn btn-primary btn-lg">
+              <i class="fas fa-sign-in-alt me-2"></i>Записаться на курс
+            </button>
+          </form>
+        </th:block>
+      </th:block>
+    </div>
+  </div>
+
+  <div class="row mt-5">
+    <div class="col-lg-8">
+      <div class="lesson-list animate-fade-in" style="animation-delay: 0.2s">
+        <h2 class="mb-4">
+          <i class="fas fa-book-reader me-2"></i>Содержание курса
+        </h2>
+
+        <th:block th:each="lesson, status : ${lessons}">
+          <div class="lesson-item">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h3 class="lesson-title">
+                  <span class="lesson-number me-2" th:text="${status.index + 1} + '.'">1.</span>
+                  <span th:text="${lesson.name}">Урок</span>
+                </h3>
+              </div>
+              <div class="lesson-actions">
+                <a th:href="@{/lessons/{id}(id=${lesson.id})}" class="btn btn-primary btn-sm">
+                <i class="fas fa-play me-1"></i>Начать
+                </a>
+              </div>
+            </div>
+          </div>
+        </th:block>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="course-progress-card animate-fade-in" style="animation-delay: 0.4s">
+        <h3>Ваш прогресс</h3>
+        <th:block th:if="${progress != null}">
+          <div class="progress mb-3">
+            <div class="progress-bar"
+                 role="progressbar"
+                 th:style="'width: ' + ${progress.completedLessons * 100 / progress.totalLessons} + '%;'"
+                 th:aria-valuenow="${progress.completedLessons * 100 / progress.totalLessons}"
+                 aria-valuemin="0" aria-valuemax="100"
+                 th:text="${progress.completedLessons * 100 / progress.totalLessons} + '%'">
+            </div>
+          </div>
+          <p class="text-center">
+            Завершено уроков: <span th:text="${progress.completedLessons}">0</span> из <span th:text="${progress.totalLessons}">0</span>
+          </p>
+        </th:block>
+        <th:block th:if="${progress == null}">
+          <p class="text-center text-muted">Прогресс недоступен.</p>
+        </th:block>
+      </div>
+
+      <div class="teacher-card animate-fade-in" style="animation-delay: 0.6s">
+        <h3>Преподаватель</h3>
+        <th:block th:if="${teacher != null}">
+          <div class="d-flex align-items-center">
+            <img th:src="${teacher.avatarUrl != null ? teacher.avatarUrl : '/images/default-avatar.png'}"
+                 alt="Преподаватель"
+                 class="teacher-avatar"
+                 style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">
+            <div class="ms-3">
+              <h4 class="teacher-name" th:text="${teacher.name}">Имя преподавателя</h4>
+            </div>
+          </div>
+        </th:block>
+        <th:block th:if="${teacher == null}">
+          <p class="text-muted">Информация о преподавателе отсутствует.</p>
+        </th:block>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-5">
+    <h2>Отзывы</h2>
+    <th:block th:each="review : ${reviews}">
+      <div class="review-card">
+        <div class="review-header d-flex align-items-center">
+          <img th:src="${review.user.avatarUrl != null ? review.user.avatarUrl : '/images/default-avatar.png'}"
+               alt="Аватар пользователя" class="review-avatar">
+          <div class="ms-3">
+            <h5 class="review-user-name" th:text="${review.user.name}">Имя пользователя</h5>
+            <small class="text-muted review-date" th:attr="data-date=${review.createdAt}"></small>
+          </div>
+        </div>
+        <div class="rating mt-2">
+          <th:block th:each="i : ${#numbers.sequence(1,5)}">
+            <i class="fas fa-star" th:classappend="${i <= review.rating} ? 'active' : ''"></i>
+          </th:block>
+          <span class="rating-text" th:text="${review.rating}">5</span>
+        </div>
+        <p class="review-comment mt-3" th:text="${review.comment}">Комментарий</p>
+      </div>
+    </th:block>
+
+    <th:block th:if="${#lists.isEmpty(reviews)}">
+      <p class="text-muted">Пока отзывов нет. Будьте первым!</p>
+    </th:block>
+
+    <th:block th:if="${user != null and enrolled}">
+      <form th:action="@{/reviews}" method="post" class="mt-4">
+        <input type="hidden" name="courseId" th:value="${course.id}">
+        <div class="mb-3">
+          <label for="rating" class="form-label">Оценка</label>
+          <select class="form-select" id="rating" name="rating" required>
+            <option value="5">5 - Отлично</option>
+            <option value="4">4 - Хорошо</option>
+            <option value="3">3 - Нормально</option>
+            <option value="2">2 - Плохо</option>
+            <option value="1">1 - Ужасно</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="comment" class="form-label">Ваш отзыв</label>
+          <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Добавить отзыв</button>
+      </form>
+    </th:block>
+
+    <th:block th:if="${user != null and !enrolled}">
+      <p class="text-muted mt-4">Чтобы оставить отзыв, необходимо быть записанным на этот курс.</p>
+    </th:block>
+
+    <th:block th:if="${user == null}">
+      <div class="text-muted mt-4">
+        <i class="fas fa-info-circle me-2"></i>
+        Чтобы оставить отзыв, <a href="/login">войдите</a> или <a href="/registration">зарегистрируйтесь</a>.
+      </div>
+    </th:block>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.querySelectorAll('form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+      const submitButton = this.querySelector('button[type="submit"]');
+      submitButton.disabled = true;
+      submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Подождите...';
+    });
+  });
+</script>
+</body>
+</html>

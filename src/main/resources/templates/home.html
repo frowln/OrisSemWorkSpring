@@ -10,71 +10,7 @@
   <link href="/css/home.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
-  <div class="container">
-    <a class="navbar-brand" href="#">
-      <i class="fas fa-graduation-cap me-2"></i>
-      Chill Study
-    </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto align-items-center">
-        <li class="nav-item">
-          <a class="nav-link active" th:href="@{/home}">
-            <i class="fas fa-home me-1"></i> Главная
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" th:href="@{/courses}">
-            <i class="fas fa-book me-1"></i> Мои курсы
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" th:href="@{/profile}">
-            <i class="fas fa-user me-1"></i> Профиль
-          </a>
-        </li>
-
-        <!-- если user пустой -->
-        <li class="nav-item" th:if="${user == null}">
-          <a class="nav-link" th:href="@{/login}">
-            <i class="fas fa-sign-in-alt me-1"></i> Войти
-          </a>
-        </li>
-        <li class="nav-item" th:if="${user == null}">
-          <a class="nav-link" th:href="@{/registration}">
-            <i class="fas fa-user-plus me-1"></i> Регистрация
-          </a>
-        </li>
-
-        <!-- если user не пустой -->
-        <li class="nav-item dropdown" th:if="${user != null}">
-          <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown"
-             role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <img th:src="${user.avatarUrl != null} ? ${user.avatarUrl} : '/images/default-avatar.png'"
-                 alt="Аватар" class="user-avatar me-2" />
-            <span th:text="${user.name}">User Name</span>
-          </a>
-          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-            <li>
-              <a class="dropdown-item" th:href="@{/profile}">
-                <i class="fas fa-user-circle me-2"></i>Мой профиль
-              </a>
-            </li>
-            <li><hr class="dropdown-divider"/></li>
-            <li>
-              <a class="dropdown-item" th:href="@{/logout}">
-                <i class="fas fa-sign-out-alt me-2"></i>Выйти
-              </a>
-            </li>
-          </ul>
-        </li>
-      </ul>
-    </div>
-  </div>
-</nav>
+<th:block th:replace="fragments/navbar :: navbar (activePage='home')"></th:block>
 
 <main class="main-content">
   <div class="container py-4">
@@ -94,8 +30,8 @@
     </div>
 
     <!-- кнопка "Добавить курс" для преподавателя -->
-    <div class="text-end mb-4" th:if="${user != null and user.role == 'teacher'}">
-      <a th:href="@{/addCourse}" class="btn btn-add-course">
+    <div class="text-end mb-4" th:if="${user != null and user.role == 'ROLE_TEACHER'}">
+      <a th:href="@{/courses/new}" class="btn btn-add-course">
         <i class="fas fa-plus me-2"></i>Добавить курс
       </a>
     </div>
@@ -117,13 +53,12 @@
                   <span class="rating-text" th:text="${#numbers.formatDecimal(course.averageRating, 1, 1)}">4.5</span>
                 </div>
 
-                <div class="course-action" th:if="${user != null and user.role != 'teacher'}">
+                <div class="course-action" th:if="${user != null and user.role != 'ROLE_TEACHER'}">
                   <div th:switch="${enrolledCourseIds.contains(course.id)}">
                     <button type="button" class="btn btn-enrolled" th:case="true" disabled>
                       <i class="fas fa-check me-2"></i>Вы записаны
                     </button>
                     <form th:case="false" action="#" th:action="@{/enroll}" method="post" class="d-inline">
-                      <input type="hidden" name="userId" th:value="${user.id}" />
                       <input type="hidden" name="courseId" th:value="${course.id}" />
                       <button type="submit" class="btn btn-primary">
                         <i class="fas fa-graduation-cap me-2"></i>Записаться

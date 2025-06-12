@@ -13,6 +13,8 @@ import kpfu.itis.kasimov.services.UserCourseService;
 import kpfu.itis.kasimov.dto.UserCourseDTO;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -57,4 +59,22 @@ public class UserCourseService {
         return userCourseRepository.findByUser_Id(userId).stream()
                 .map(uc -> uc.getCourse()).toList();
     }
+
+    public int countEnrolled(Integer courseId) {
+        return userCourseRepository.countByCourse_Id(courseId);
+    }
+
+    public List<User> findStudentsByCourseId(Integer courseId) {
+        return userCourseRepository.findByCourseId(courseId)
+                .stream()
+                .map(UserCourse::getUser)
+                .collect(Collectors.toList());
+    }
+
+    public void removeStudentFromCourse(Integer courseId, Integer studentId) {
+        Optional<UserCourse> userCourseOpt = userCourseRepository.findByUserIdAndCourseId(studentId, courseId);
+        userCourseOpt.ifPresent(userCourseRepository::delete);
+    }
+
+
 }

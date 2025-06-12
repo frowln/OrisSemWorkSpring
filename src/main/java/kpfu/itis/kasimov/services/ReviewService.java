@@ -27,11 +27,7 @@ public class ReviewService {
         return reviewRepository.findByCourse_Id(courseId);
     }
 
-    public void addReview(Review review) {
-        reviewRepository.save(review);
-    }
-
-    public void add(Review review) {
+    public void save(Review review) {
         reviewRepository.save(review);
     }
 

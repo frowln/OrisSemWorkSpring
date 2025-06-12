@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Добавить Курс</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="/css/home.css" rel="stylesheet">
+  <link href="/css/addCourse.css" rel="stylesheet">
+</head>
+<body>
+
+<th:block th:replace="fragments/navbar :: navbar (activePage='courses')"></th:block>
+
+
+<div class="add-course-container">
+  <div class="form-card">
+    <div class="form-header">
+      <h1 class="form-title">Создать новый курс</h1>
+      <p class="form-subtitle">
+        Создайте увлекательный курс для ваших студентов. Добавьте подробное
+        описание и структурируйте материал.
+      </p>
+    </div>
+
+    <!-- Форма привязана к объекту courseDTO из модели -->
+    <form th:action="@{/courses/new}" th:object="${courseDTO}" method="post" class="course-form">
+      <div class="form-group">
+        <label for="name" class="form-label">Название курса</label>
+        <!-- Поле будет заполнено значением courseDTO.name, а в случае ошибки валидации --- заполнено прошлое значение -->
+        <input
+                type="text"
+                th:field="*{name}"
+                class="form-control"
+                id="name"
+                placeholder="Введите название курса"
+                required
+        />
+        <div class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Ошибка</div>
+      </div>
+
+      <div class="form-group">
+        <label for="description" class="form-label">Описание курса</label>
+        <textarea
+                th:field="*{description}"
+                class="form-control"
+                id="description"
+                rows="5"
+                placeholder="Опишите, чему научатся студенты в этом курсе"
+                required
+        ></textarea>
+        <div
+                class="text-danger"
+                th:if="${#fields.hasErrors('description')}"
+                th:errors="*{description}"
+        >Ошибка</div>
+      </div>
+
+      <div class="feature-list">
+        <div class="feature-item">
+          <i class="fas fa-video feature-icon"></i>
+          <div class="feature-text">
+            Добавляйте видео-уроки и интерактивные материалы
+          </div>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-users feature-icon"></i>
+          <div class="feature-text">
+            Взаимодействуйте со студентами через отзывы
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-container">
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-plus-circle me-2"></i> Создать курс
+        </button>
+        <a th:href="@{/}" class="btn btn-secondary">
+          <i class="fas fa-arrow-left me-2"></i> Назад
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -21,12 +21,15 @@ public class UserLessonService {
     private final UserLessonRepository userLessonRepository;
     private final UserRepository userRepository;
     private final LessonRepository lessonRepository;
+    private final UserProgressService userProgressService;
 
     @Autowired
-    public UserLessonService(UserLessonRepository userLessonRepository, UserRepository userRepository, LessonRepository lessonRepository) {
+    public UserLessonService(UserLessonRepository userLessonRepository, UserRepository userRepository,
+                             LessonRepository lessonRepository, UserProgressService userProgressService) {
         this.userLessonRepository = userLessonRepository;
         this.userRepository = userRepository;
         this.lessonRepository = lessonRepository;
+        this.userProgressService = userProgressService;
     }
 
     public List<UserLessonDTO> findByUserId(Integer userId) {
@@ -34,15 +37,33 @@ public class UserLessonService {
     }
 
     public void markAsCompleted(Integer userId, Integer lessonId) {
+
         User user = userRepository.findById(userId).orElseThrow();
         Lesson lesson = lessonRepository.findById(lessonId).orElseThrow();
+
+        // Check if already completed
+        Optional<UserLesson> existing = userLessonRepository.findByUser_IdAndLesson_Id(userId, lessonId);
+        if (existing.isPresent()) {
+            // already marked completed → do nothing
+            return;
+        }
+
+        // Mark UserLesson
         UserLesson userLesson = new UserLesson();
         userLesson.setUser(user);
         userLesson.setLesson(lesson);
         userLesson.setCompleted(true);
         userLesson.setLastUpdated(new Timestamp(System.currentTimeMillis()));
+
         userLessonRepository.save(userLesson);
+
+        // Update UserProgress
+        int completedLessons = userLessonRepository.countCompletedLessons(userId, lesson.getCourse().getId());
+        int totalLessons = lessonRepository.findByCourse_Id(lesson.getCourse().getId()).size();
+
+        userProgressService.updateProgress(userId, lesson.getCourse().getId(), completedLessons, totalLessons);
     }
+
 
     public Optional<UserLessonDTO> findByUserIdAndLessonId(Integer userId, Integer lessonId) {
         return userLessonRepository.findByUser_IdAndLesson_Id(userId, lessonId)

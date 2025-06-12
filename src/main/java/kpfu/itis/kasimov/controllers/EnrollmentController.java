@@ -1,6 +1,7 @@
 package kpfu.itis.kasimov.controllers;
 
 import kpfu.itis.kasimov.models.User;
+import kpfu.itis.kasimov.security.CustomUserDetails;
 import kpfu.itis.kasimov.services.UserCourseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -19,17 +20,20 @@ public class EnrollmentController {
 
     @PostMapping
     public String enroll(@RequestParam Integer courseId, Principal principal) {
-        User user = (User) ((Authentication) principal).getPrincipal();
+        CustomUserDetails userDetails = (CustomUserDetails) ((Authentication) principal).getPrincipal();
+        User user = userDetails.getPerson();
         userCourseService.enroll(user.getId(), courseId);
         return "redirect:/courses/" + courseId;
     }
 
     @PostMapping("/leave")
     public String leave(@RequestParam Integer courseId, Principal principal) {
-        User user = (User) ((Authentication) principal).getPrincipal();
+        CustomUserDetails userDetails = (CustomUserDetails) ((Authentication) principal).getPrincipal();
+        User user = userDetails.getPerson();
         userCourseService.leave(user.getId(), courseId);
         return "redirect:/courses/" + courseId;
     }
+
 
     @PostMapping("/remove")
     public String removeStudent(@RequestParam Integer courseId, @RequestParam Integer studentId) {

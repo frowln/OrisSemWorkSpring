@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мой Профиль</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/home.css" rel="stylesheet" type="text/css">
+    <link href="/css/profile.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+
+<th:block th:replace="fragments/navbar :: navbar (activePage='profile')"></th:block>
+
+<div class="profile-container">
+    <div class="page-header">
+        <div class="header-content">
+            <h1 class="page-title">Мой профиль</h1>
+            <p class="page-subtitle">Управление личной информацией</p>
+        </div>
+    </div>
+
+    <div class="profile-content">
+        <div class="profile-card">
+            <div class="card-header">
+                <i class="fas fa-user-circle"></i>
+                <h3>Личные данные</h3>
+            </div>
+            <div class="card-body">
+
+                <div th:if="${successMessage}" class="alert alert-success">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span th:text="${successMessage}"></span>
+                </div>
+
+                <div th:if="${errorMessage}" class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span th:text="${errorMessage}"></span>
+                </div>
+
+                <form th:action="@{/profile}" method="post" enctype="multipart/form-data" class="profile-form" th:object="${user}">
+                    <div class="avatar-section">
+                        <div class="avatar-wrapper">
+                            <img th:src="${user.avatarUrl != null} ? ${user.avatarUrl} : '/images/default-avatar.png'"
+                                 alt="Аватар" class="profile-avatar">
+                            <div class="avatar-overlay">
+                                <label for="avatar" class="avatar-upload-label">
+                                    <i class="fas fa-camera"></i>
+                                    <span>Изменить фото</span>
+                                </label>
+                            </div>
+                        </div>
+                        <input type="file" id="avatar" name="avatar" accept="image/*" hidden>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="form-group">
+                            <label for="name" class="form-label">
+                                <i class="fas fa-user"></i>
+                                Имя
+                            </label>
+                            <input type="text" class="form-control" id="name" name="name" th:value="*{name}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email" class="form-label">
+                                <i class="fas fa-envelope"></i>
+                                Email
+                            </label>
+                            <input type="email" class="form-control" id="email" name="email" th:value="*{email}" required>
+                        </div>
+
+                        <div class="password-section">
+                            <h4 class="section-title">
+                                <i class="fas fa-lock"></i>
+                                Изменение пароля
+                            </h4>
+                            <div class="form-group">
+                                <label for="password" class="form-label">Новый пароль</label>
+                                <div class="password-input-group">
+                                    <input type="password" class="form-control" id="password" name="password"
+                                           placeholder="Введите новый пароль">
+                                    <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="confirmPassword" class="form-label">Подтверждение пароля</label>
+                                <div class="password-input-group">
+                                    <input type="password" class="form-control" id="confirmPassword"
+                                           name="confirmPassword" placeholder="Подтвердите новый пароль">
+                                    <button type="button" class="password-toggle"
+                                            onclick="togglePassword('confirmPassword')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-save">
+                                <i class="fas fa-save"></i>
+                                Сохранить изменения
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.getElementById('avatar').addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.querySelector('.profile-avatar').src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    function togglePassword(inputId) {
+        const input = document.getElementById(inputId);
+        const icon = input.nextElementSibling.querySelector('i');
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+</script>
+</body>
+</html>
