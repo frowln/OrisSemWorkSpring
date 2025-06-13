@@ -2,15 +2,13 @@ package kpfu.itis.kasimov.controllers;
 
 import kpfu.itis.kasimov.models.ChatMessage;
 import kpfu.itis.kasimov.models.User;
-import kpfu.itis.kasimov.security.CustomUserDetails;
+import kpfu.itis.kasimov.security.SecurityUtil;
 import kpfu.itis.kasimov.services.ChatMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -18,20 +16,23 @@ import java.util.List;
 @RequestMapping("/chat")
 @RequiredArgsConstructor
 public class ChatController {
+
     private final ChatMessageService chatMessageService;
 
     @GetMapping("/{courseId}")
-    public String chatPage(@PathVariable Integer courseId, Model model, Authentication authentication) {
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        User user = userDetails.getPerson();
+    public String chatPage(@PathVariable Integer courseId,
+                           Model model,
+                           Authentication authentication) {
 
-        model.addAttribute("user", user);
-        model.addAttribute("courseId", courseId);
+        User user = SecurityUtil.currentUser(authentication);
+        if (user == null) return "redirect:/auth/login";
+
+        model.addAttribute("user",      user);
+        model.addAttribute("courseId",  courseId);
 
         List<ChatMessage> messages = chatMessageService.getMessagesForCourse(courseId);
         model.addAttribute("messages", messages);
 
         return "chat/chat";
     }
-
 }

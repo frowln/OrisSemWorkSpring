@@ -1,138 +1,124 @@
 package kpfu.itis.kasimov.controllers;
 
+import jakarta.validation.Valid;
 import kpfu.itis.kasimov.models.Lesson;
 import kpfu.itis.kasimov.models.User;
-import kpfu.itis.kasimov.security.CustomUserDetails;
-import kpfu.itis.kasimov.services.CourseService;
-import kpfu.itis.kasimov.services.LessonService;
-import kpfu.itis.kasimov.services.ProgressService;
-import kpfu.itis.kasimov.services.UserCourseService;
+import kpfu.itis.kasimov.services.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
 
 @Controller
 @RequestMapping("/lessons")
 @RequiredArgsConstructor
 public class LessonController {
-    private final LessonService lessonService;
-    private final CourseService courseService;
-    private final ProgressService progressService;
+
+    private final LessonService    lessonService;
+    private final CourseService    courseService;
+    private final ProgressService  progressService;
     private final UserCourseService userCourseService;
 
-    // Добавить урок
+    /*─────────────────────  СОЗДАТЬ УРОК  ─────────────────────*/
+
+    @PreAuthorize("hasRole('TEACHER')")
     @GetMapping("/new")
-    public String showAddForm(@RequestParam Integer courseId, Model model, Principal principal) {
-        CustomUserDetails userDetails = (CustomUserDetails) ((Authentication) principal).getPrincipal();
-        User user = userDetails.getPerson();
-        model.addAttribute("user", user);
+    public String showAddForm(
+            @RequestParam Integer courseId,
+            Model model,
+            @AuthenticationPrincipal(expression = "user") User current      // ***
+    ) {
+        model.addAttribute("user", current);
         model.addAttribute("courseId", courseId);
         model.addAttribute("lesson", new Lesson());
         return "lessons/create";
     }
 
+    @PreAuthorize("hasRole('TEACHER')")
     @PostMapping("/new")
-    public String addLesson(@ModelAttribute("lesson") Lesson lesson, @RequestParam Integer courseId) {
+    public String addLesson(
+            @ModelAttribute("lesson") Lesson lesson,
+            @RequestParam Integer courseId
+    ) {
         lesson.setCourse(courseService.findById(courseId));
         lessonService.save(lesson);
         return "redirect:/courses/" + courseId;
     }
 
-    // Показать урок
-    @GetMapping("/{id}")
-    public String showLesson(@PathVariable Integer id, Model model, Principal principal) {
-        Lesson lesson = lessonService.findById(id).orElseThrow();
+    /*──────────────────────  ПОКАЗ УРОКА  ─────────────────────*/
 
-        boolean completed = false;
-        boolean enrolled = false;
+    @GetMapping("/{id}")
+    public String showLesson(
+            @PathVariable Integer id,
+            Model model,
+            @AuthenticationPrincipal(expression = "user") User current      // ***
+    ) {
+        Lesson lesson   = lessonService.findById(id).orElseThrow();
         Integer courseId = lesson.getCourse().getId();
 
-        if (principal != null) {
-            CustomUserDetails userDetails = (CustomUserDetails) ((Authentication) principal).getPrincipal();
-            User user = userDetails.getPerson();
+        boolean enrolled  = current != null && userCourseService.isEnrolled(current.getId(), courseId);
+        boolean completed = enrolled     && progressService.isCompleted(current.getId(), id);
 
-            // вот правильная проверка:
-            enrolled = userCourseService.isEnrolled(user.getId(), courseId);
-
-            if (enrolled) {
-                completed = progressService.isCompleted(user.getId(), id);
-            }
-
-            model.addAttribute("user", user); // Добавляем user для шаблона
-        }
-
+        model.addAttribute("user", current);
         model.addAttribute("lesson", lesson);
-        model.addAttribute("completed", completed);
         model.addAttribute("enrolled", enrolled);
-
+        model.addAttribute("completed", completed);
         return "lessons/show";
     }
 
+    /*──────────────  ОТМЕТИТЬ «ЗАВЕРШЁН»  ───────────────*/
 
-    // Отметить как завершённый
     @PostMapping("/{id}/complete")
-    public String completeLesson(@PathVariable Integer id, Principal principal) {
-        CustomUserDetails userDetails = (CustomUserDetails) ((Authentication) principal).getPrincipal();
-        User user = userDetails.getPerson();
+    public String completeLesson(
+            @PathVariable Integer id,
+            @AuthenticationPrincipal(expression = "user") User current      // ***
+    ) {
         Lesson lesson = lessonService.findById(id).orElseThrow();
-        progressService.markAsCompleted(user.getId(), id, lesson.getCourse().getId());
+        progressService.markAsCompleted(current.getId(), id, lesson.getCourse().getId());
         return "redirect:/lessons/" + id;
     }
 
-    // Страница редактирования урока
+    /*───────────────────  РЕДАКТИРОВАНИЕ  ──────────────────*/
+
     @PreAuthorize("hasRole('TEACHER')")
     @GetMapping("/{id}/edit")
-    public String showEditLessonForm(
+    public String showEditForm(
             @PathVariable Integer id,
             @RequestParam Integer courseId,
-            Model model, Principal principal
+            Model model,
+            @AuthenticationPrincipal(expression = "user") User current      // ***
     ) {
-        CustomUserDetails userDetails = (CustomUserDetails) ((Authentication) principal).getPrincipal();
-        User user = userDetails.getPerson();
-        model.addAttribute("user", user);
-        Lesson lesson = lessonService.findById(id).orElseThrow();
-        model.addAttribute("lesson", lesson);
+        model.addAttribute("user", current);
+        model.addAttribute("lesson", lessonService.findById(id).orElseThrow());
         model.addAttribute("courseId", courseId);
         return "lessons/editLesson";
     }
 
-    // Сохранение изменений урока
     @PreAuthorize("hasRole('TEACHER')")
     @PostMapping("/{id}/edit")
     public String updateLesson(
             @PathVariable Integer id,
             @RequestParam Integer courseId,
-            @ModelAttribute("lesson") Lesson updatedLesson
+            @ModelAttribute("lesson") @Valid Lesson updated
     ) {
-        Lesson existingLesson = lessonService.findById(id).orElseThrow();
-
-        existingLesson.setName(updatedLesson.getName());
-        existingLesson.setBody(updatedLesson.getBody());
-
-        lessonService.save(existingLesson);
-
+        Lesson origin = lessonService.findById(id).orElseThrow();
+        origin.setName(updated.getName());
+        origin.setBody(updated.getBody());
+        lessonService.save(origin);
         return "redirect:/courses/" + courseId + "/manage";
     }
 
-    // Удаление урока
+    /*──────────────────────  УДАЛЕНИЕ  ─────────────────────*/
+
     @PreAuthorize("hasRole('TEACHER')")
     @PostMapping("/{id}/delete")
     public String deleteLesson(
             @PathVariable Integer id,
-            @RequestParam Integer courseId,
-            Principal principal,
-            Model model) {
-        CustomUserDetails userDetails = (CustomUserDetails) ((Authentication) principal).getPrincipal();
-        User user = userDetails.getPerson();
-        model.addAttribute("user", user);
+            @RequestParam Integer courseId
+    ) {
         lessonService.deleteById(id);
         return "redirect:/courses/" + courseId + "/manage";
     }
-
 }
-

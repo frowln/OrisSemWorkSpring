@@ -15,5 +15,8 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
     @Query("SELECT c FROM Course c JOIN c.students s WHERE s.id = :studentId")
     List<Course> findCoursesByStudentId(@Param("studentId") Integer studentId);
     List<Course> findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String name, String description);
+    @Query("SELECT c FROM Course c WHERE " +
+           "(SELECT COUNT(u) FROM UserCourse u WHERE u.course = c) > 0")
+    List<Course> findCoursesWithEnrolledStudents();
 }
 

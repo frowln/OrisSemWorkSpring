@@ -3,16 +3,14 @@ package kpfu.itis.kasimov.controllers;
 import kpfu.itis.kasimov.models.Course;
 import kpfu.itis.kasimov.models.Review;
 import kpfu.itis.kasimov.models.User;
-import kpfu.itis.kasimov.security.CustomUserDetails;
+import kpfu.itis.kasimov.security.SecurityUtil;
 import kpfu.itis.kasimov.services.CourseService;
 import kpfu.itis.kasimov.services.ReviewService;
 import kpfu.itis.kasimov.services.UserCourseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
 
@@ -31,13 +29,9 @@ public class ReviewController {
                             @RequestParam String comment,
                             Authentication authentication) {
 
-        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails userDetails)) {
-            return "redirect:/login";
-        }
+        User user = SecurityUtil.currentUser(authentication);
+        if (user == null) return "redirect:/auth/login";
 
-        User user = userDetails.getPerson();
-
-        // Проверяем, записан ли пользователь
         if (!userCourseService.isEnrolled(user.getId(), courseId)) {
             return "redirect:/courses/" + courseId + "?error=notEnrolled";
         }
@@ -52,7 +46,6 @@ public class ReviewController {
         review.setCreatedAt(new Timestamp(System.currentTimeMillis()));
 
         reviewService.save(review);
-
         return "redirect:/courses/" + courseId;
     }
 }

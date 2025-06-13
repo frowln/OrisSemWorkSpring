@@ -42,8 +42,8 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public void update(User user) {
-        userRepository.save(user);
+    public User update(User user) {
+        return userRepository.save(user);
     }
 
     public List<UserDTO> findAll() {
@@ -57,4 +57,12 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public User findByEmailOrNull(String email) {
+        return userRepository.findByEmail(email).orElse(null);
+    }
+
+    // 2. универсальный save (можно просто делегировать register/update)
+    public User save(User user) {
+        return userRepository.save(user);
+    }
 }

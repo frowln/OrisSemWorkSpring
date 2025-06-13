@@ -1,79 +1,66 @@
 package kpfu.itis.kasimov.controllers;
 
 import kpfu.itis.kasimov.models.User;
-import kpfu.itis.kasimov.security.CustomUserDetails;
 import kpfu.itis.kasimov.services.UserService;
 import kpfu.itis.kasimov.util.CloudinaryUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.security.Principal;
-
 @Controller
 @RequestMapping("/profile")
 @RequiredArgsConstructor
 public class ProfileController {
 
-    private final UserService userService;
+    private final UserService     userService;
     private final PasswordEncoder passwordEncoder;
 
     @GetMapping
-    public String showProfile(Model model, Principal principal) {
-        CustomUserDetails userDetails = (CustomUserDetails) ((Authentication) principal).getPrincipal();
-        User user = userDetails.getPerson();
-        model.addAttribute("user", user);
+    public String showProfile(
+            Model model,
+            @AuthenticationPrincipal(expression = "user") User current
+    ) {
+        model.addAttribute("user", current);
         return "profile/show";
     }
 
     @PostMapping
     public String updateProfile(
-            @ModelAttribute("user") User updated,
+            @ModelAttribute("user") User form,
             @RequestParam("avatar") MultipartFile file,
-            @RequestParam(value = "confirmPassword", required = false) String confirmPassword,
-            Principal principal,
+            @RequestParam(value = "confirmPassword", required = false) String confirm,
+            @AuthenticationPrincipal(expression = "user") User current,   // ***
             Model model
     ) {
-        CustomUserDetails userDetails = (CustomUserDetails) ((Authentication) principal).getPrincipal();
-        User user = userDetails.getPerson();
-
-        // Обновляем аватарку
         if (!file.isEmpty()) {
             try {
-                String avatarUrl = CloudinaryUtil.upload(file);
-                user.setAvatarUrl(avatarUrl);
+                current.setAvatarUrl(CloudinaryUtil.upload(file));
             } catch (Exception e) {
                 model.addAttribute("errorMessage", "Ошибка загрузки аватара: " + e.getMessage());
-                model.addAttribute("user", user);
+                model.addAttribute("user", current);
                 return "profile/show";
             }
         }
 
-        // Обновляем имя/email
-        user.setName(updated.getName());
-        user.setEmail(updated.getEmail());
+        current.setName(form.getName());
+        current.setEmail(form.getEmail());
 
-        // Обновляем пароль — только если пользователь его ввёл
-        if (updated.getPassword() != null && !updated.getPassword().isEmpty()) {
-            if (confirmPassword == null || !updated.getPassword().equals(confirmPassword)) {
+        if (form.getPassword() != null && !form.getPassword().isBlank()) {
+            if (confirm == null || !form.getPassword().equals(confirm)) {
                 model.addAttribute("errorMessage", "Пароль и подтверждение не совпадают");
-                model.addAttribute("user", user);
+                model.addAttribute("user", current);
                 return "profile/show";
             }
-            String hashedPassword = passwordEncoder.encode(updated.getPassword());
-            user.setPassword(hashedPassword);
+            current.setPassword(passwordEncoder.encode(form.getPassword()));
         }
 
-        // Сохраняем изменения
-        userService.update(user);
-
+        userService.update(current);
         model.addAttribute("successMessage", "Профиль обновлён");
-        model.addAttribute("user", user);
+        model.addAttribute("user", current);
         return "profile/show";
     }
-
 }
