@@ -1,0 +1,11 @@
+spring:
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true     # красиво форматирует SQL в консоли
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG                      # сами запросы
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE   # значения параметров

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Восстановление пароля | Chill Study</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+  <link rel="stylesheet" href="/css/authetification.css"/>
+</head>
+<body>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-5">
+      <div class="card">
+        <div class="logo-container">
+          <div class="logo-bg"></div>
+          <div class="logo-icon">
+            <i class="fas fa-unlock-alt fa-2x"></i>
+          </div>
+        </div>
+
+        <h1 class="card-title">Восстановление пароля</h1>
+        <p class="subtitle">Введите email для получения временного пароля</p>
+
+        <!-- Сообщение -->
+        <div th:if="${message}" class="alert alert-success">
+          <i class="fas fa-check-circle"></i>
+          <span th:text="${message}"></span>
+        </div>
+
+        <!-- Ошибка -->
+        <div th:if="${error}" class="alert alert-danger">
+          <i class="fas fa-exclamation-circle"></i>
+          <span th:text="${error}"></span>
+        </div>
+
+        <form th:action="@{/auth/recovery}" method="post">
+          <div class="form-group form-floating">
+            <i class="fas fa-envelope input-icon"></i>
+            <input type="email"
+                   class="form-control input-with-icon"
+                   id="email"
+                   name="email"
+                   placeholder=" "
+                   required/>
+            <label for="email">Email адрес</label>
+          </div>
+
+          <button type="submit" class="btn btn-primary ripple">
+            <span>Отправить</span>
+            <i class="fas fa-paper-plane ml-2"></i>
+          </button>
+
+          <div class="register-link">
+            <p>
+              Вспомнили пароль?
+              <a th:href="@{/auth/login}">Войти</a>
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.ripple').forEach(button => {
+    button.addEventListener('click', function (e) {
+      let x = e.clientX - e.target.offsetLeft;
+      let y = e.clientY - e.target.offsetTop;
+
+      let ripples = document.createElement('span');
+      ripples.style.left = x + 'px';
+      ripples.style.top = y + 'px';
+      this.appendChild(ripples);
+
+      setTimeout(() => {
+        ripples.remove();
+      }, 1000);
+    });
+  });
+</script>
+</body>
+</html>

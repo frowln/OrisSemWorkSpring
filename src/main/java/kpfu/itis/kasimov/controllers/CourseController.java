@@ -16,10 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -292,6 +289,11 @@ public class CourseController {
         return "redirect:/courses/" + courseId + "/manage";
     }
 
-
-
+    @GetMapping("/{id}/chat")
+    public String chat(@PathVariable Integer id, Model model, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        User user = userDetails.getPerson();
+        model.addAttribute("user", user);
+        model.addAttribute("courseId", id);
+        return "courses/chat";
+    }
 }

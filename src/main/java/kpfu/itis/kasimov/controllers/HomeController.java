@@ -2,6 +2,7 @@ package kpfu.itis.kasimov.controllers;
 
 import kpfu.itis.kasimov.models.Course;
 import kpfu.itis.kasimov.models.User;
+import kpfu.itis.kasimov.security.CustomOAuth2User;
 import kpfu.itis.kasimov.security.CustomUserDetails;
 import kpfu.itis.kasimov.services.CourseService;
 import kpfu.itis.kasimov.services.UserCourseService;
@@ -36,19 +37,30 @@ public class HomeController {
     private String loadCoursesToModel(Model model, Principal principal, List<Course> courses) {
         model.addAttribute("courses", courses);
 
-        if (principal instanceof Authentication authentication
-            && authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
+        if (principal instanceof Authentication authentication) {
+            Object principalObj = authentication.getPrincipal();
 
-            User user = userDetails.getPerson();
-            model.addAttribute("user", user);
+            User user = null;
 
-            List<Course> enrolledCourses = userCourseService.getEnrolledCourses(user.getId());
-            model.addAttribute("enrolledCourses", enrolledCourses);
-            model.addAttribute("enrolledCourseIds", enrolledCourses.stream()
-                    .map(Course::getId)
-                    .collect(Collectors.toList()));
+            if (principalObj instanceof CustomUserDetails userDetails) {
+                user = userDetails.getPerson();
+            } else if (principalObj instanceof CustomOAuth2User customOAuth2User) {
+                user = customOAuth2User.getUser();
+            }
+
+            if (user != null) {
+                model.addAttribute("userName", user.getName());
+                model.addAttribute("avatarUrl", user.getAvatarUrl());
+
+                List<Course> enrolledCourses = userCourseService.getEnrolledCourses(user.getId());
+                model.addAttribute("enrolledCourses", enrolledCourses);
+                model.addAttribute("enrolledCourseIds", enrolledCourses.stream()
+                        .map(Course::getId)
+                        .collect(Collectors.toList()));
+            }
         }
 
         return "home";
     }
+
 }

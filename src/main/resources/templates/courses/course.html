@@ -121,6 +121,9 @@
         <th:block th:if="${teacher == null}">
           <p class="text-muted">Информация о преподавателе отсутствует.</p>
         </th:block>
+        <a th:href="@{/chat/{id}(id=${course.id})}" class="btn btn-primary mt-3">
+          <i class="fas fa-comments me-2"></i>Чат с преподавателем
+        </a>
       </div>
     </div>
   </div>

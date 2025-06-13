@@ -8,6 +8,7 @@ import kpfu.itis.kasimov.repositories.ReviewRepository;
 import kpfu.itis.kasimov.dto.ReviewDTO;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -29,6 +30,18 @@ public class ReviewService {
 
     public void save(Review review) {
         reviewRepository.save(review);
+    }
+
+    public List<Review> findAll() {
+        return reviewRepository.findAll();
+    }
+
+    public Optional<Review> findReviewById(Integer id) {
+        return reviewRepository.findById(id);
+    }
+
+    public void delete(Integer id) {
+        reviewRepository.deleteById(id);
     }
 
 }

@@ -70,6 +70,14 @@
               Нет аккаунта?
               <a th:href="@{/auth/registration}">Зарегистрироваться</a>
             </p>
+            <p>
+              <a th:href="@{/auth/recovery}" style="font-size: 0.9em;">Забыли пароль?</a>
+            </p>
+          </div>
+          <div class="google-login mt-3 text-center">
+            <a href="/oauth2/authorization/google" class="btn btn-outline-primary">
+              <i class="fab fa-google me-2"></i> Войти через Google
+            </a>
           </div>
         </form>
       </div>

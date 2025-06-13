@@ -3,6 +3,7 @@ package kpfu.itis.kasimov.services;
 import kpfu.itis.kasimov.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import kpfu.itis.kasimov.models.User;
@@ -15,14 +16,20 @@ import java.util.Optional;
 @Transactional
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public Optional<User> findById(Integer id) {
         return userRepository.findById(id);
+    }
+
+    public User findByName(String name) {
+        return userRepository.findByName(name);
     }
 
     public User findByEmail(String email) {
@@ -31,8 +38,8 @@ public class UserService {
     }
 
 
-    public void register(User user) {
-        userRepository.save(user);
+    public User register(User user) {
+        return userRepository.save(user);
     }
 
     public void update(User user) {
@@ -42,4 +49,12 @@ public class UserService {
     public List<UserDTO> findAll() {
         return userRepository.findAll().stream().map(UserDTO::valueOf).toList();
     }
+
+    @Transactional
+    public void updatePassword(Integer userId, String rawPassword) {
+        User user = userRepository.findById(userId).orElseThrow();
+        user.setPassword(passwordEncoder.encode(rawPassword));
+        userRepository.save(user);
+    }
+
 }
