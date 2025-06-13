@@ -1,5 +1,6 @@
 package kpfu.itis.kasimov.services;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,18 +13,17 @@ import java.util.Optional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class ReviewService {
+
     private final ReviewRepository reviewRepository;
 
-    @Autowired
-    public ReviewService(ReviewRepository reviewRepository) {
-        this.reviewRepository = reviewRepository;
-    }
-
+    @Transactional(readOnly = true)
     public ReviewDTO findById(Integer id) {
         return ReviewDTO.valueOf(reviewRepository.findById(id).orElseThrow());
     }
 
+    @Transactional(readOnly = true)
     public List<Review> findByCourseId(Integer courseId) {
         return reviewRepository.findByCourse_Id(courseId);
     }
@@ -32,10 +32,12 @@ public class ReviewService {
         reviewRepository.save(review);
     }
 
+    @Transactional(readOnly = true)
     public List<Review> findAll() {
         return reviewRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public Optional<Review> findReviewById(Integer id) {
         return reviewRepository.findById(id);
     }

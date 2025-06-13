@@ -3,6 +3,7 @@ package kpfu.itis.kasimov.services;
 import kpfu.itis.kasimov.dto.UserLessonDTO;
 import kpfu.itis.kasimov.dto.UserProgressDTO;
 import kpfu.itis.kasimov.models.UserProgress;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,19 +12,12 @@ import java.util.Optional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class ProgressService {
+
     private final UserLessonService userLessonService;
     private final UserProgressService userProgressService;
     private final LessonService lessonService;
-
-    @Autowired
-    public ProgressService(UserLessonService userLessonService,
-                               UserProgressService userProgressService,
-                               LessonService lessonService) {
-        this.userLessonService = userLessonService;
-        this.userProgressService = userProgressService;
-        this.lessonService = lessonService;
-    }
 
     public boolean isCompleted(Integer userId, Integer lessonId) {
         return userLessonService.findByUserIdAndLessonId(userId, lessonId)
@@ -39,6 +33,7 @@ public class ProgressService {
         userProgressService.updateProgress(userId, courseId, completedLessons, totalLessons);
     }
 
+    @Transactional(readOnly = true)
     public Optional<UserProgress> getProgress(Integer userId, Integer courseId) {
         return userProgressService.getEntityByUserAndCourse(userId, courseId);
     }

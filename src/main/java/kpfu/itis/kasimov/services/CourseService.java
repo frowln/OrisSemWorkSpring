@@ -1,5 +1,6 @@
 package kpfu.itis.kasimov.services;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,18 +12,17 @@ import java.util.List;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class CourseService {
+
     private final CourseRepository courseRepository;
 
-    @Autowired
-    public CourseService(CourseRepository courseRepository) {
-        this.courseRepository = courseRepository;
-    }
-
+    @Transactional(readOnly = true)
     public Course findById(Integer id) {
         return courseRepository.findById(id).orElse(null);
     }
 
+    @Transactional(readOnly = true)
     public List<CourseDTO> findByTeacherId(Integer teacherId) {
         return courseRepository.findByTeacherId(teacherId).stream().map(CourseDTO::valueOf).toList();
     }
@@ -35,21 +35,17 @@ public class CourseService {
         courseRepository.deleteById(id);
     }
 
+    @Transactional(readOnly = true)
     public List<CourseDTO> searchByName(String query) {
         return courseRepository.findByNameContaining(query).stream().map(CourseDTO::valueOf).toList();
     }
 
+    @Transactional(readOnly = true)
     public List<Course> findAll() {
         return courseRepository.findAll();
     }
 
-    public List<CourseDTO> findCoursesByStudentId(Integer studentId) {
-        return courseRepository.findCoursesByStudentId(studentId)
-                .stream()
-                .map(CourseDTO::valueOf)
-                .toList();
-    }
-
+    @Transactional(readOnly = true)
     public List<Course> searchCourses(String query) {
         if (query == null || query.isBlank()) {
             return courseRepository.findAll();

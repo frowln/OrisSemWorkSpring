@@ -4,6 +4,7 @@ import kpfu.itis.kasimov.models.Course;
 import kpfu.itis.kasimov.models.User;
 import kpfu.itis.kasimov.repositories.CourseRepository;
 import kpfu.itis.kasimov.repositories.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,21 +19,12 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class UserCourseService {
+
     private final UserCourseRepository userCourseRepository;
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
-
-    @Autowired
-    public UserCourseService(UserCourseRepository userCourseRepository, UserRepository userRepository, CourseRepository courseRepository) {
-        this.userCourseRepository = userCourseRepository;
-        this.userRepository = userRepository;
-        this.courseRepository = courseRepository;
-    }
-
-    public List<UserCourseDTO> findByUserId(Integer userId) {
-        return userCourseRepository.findByUser_Id(userId).stream().map(UserCourseDTO::valueOf).toList();
-    }
 
     public void enroll(Integer userId, Integer courseId) {
         User user = userRepository.findById(userId).orElseThrow();
@@ -55,6 +47,7 @@ public class UserCourseService {
         userCourseRepository.deleteByUser_IdAndCourse_Id(studentId, courseId);
     }
 
+    @Transactional(readOnly = true)
     public List<Course> getEnrolledCourses(Integer userId) {
         return userCourseRepository.findByUser_Id(userId).stream()
                 .map(uc -> uc.getCourse()).toList();
@@ -64,6 +57,7 @@ public class UserCourseService {
         return userCourseRepository.countByCourse_Id(courseId);
     }
 
+    @Transactional(readOnly = true)
     public List<User> findStudentsByCourseId(Integer courseId) {
         return userCourseRepository.findByCourseId(courseId)
                 .stream()
